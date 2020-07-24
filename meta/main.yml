@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: ruby
   author: Stefan Horning <stefan.horning@mediafellows.com>
   description: Installs ruby from source in given version
   company: Mediafellows GmbH
