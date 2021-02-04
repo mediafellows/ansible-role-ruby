@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/mediafellows/ansible-role-ruby.svg?branch=master)](https://travis-ci.com/mediafellows/ansible-role-ruby)
+[]()
 
 # Ansible role ruby
 
