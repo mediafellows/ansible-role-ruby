@@ -21,7 +21,7 @@ jobs:
           sudo apt-get -y autoremove
 
       - name: Delete Ruby stuff, we will install our own Ruby with this role
-        run: sudo rm /usr/bin/ruby /usr/bin/gem /usr/local/bin/update_rubygems
+        run: sudo rm /usr/local/bin/update_rubygems
 
       # -- Cleanup end --
 
