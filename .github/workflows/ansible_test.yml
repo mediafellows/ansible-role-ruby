@@ -1,0 +1,60 @@
+---
+
+name: Ansible-Test
+on: [ push, pull_request ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ANSIBLE_FORCE_COLOR: true
+    steps:
+
+      # -- CI runnner cleanup --
+
+      - name: Remove uneeded apt repos (causing issues)
+        run: sudo rm /etc/apt/sources.list.d/yarn*
+
+      - name: Remove Ruby packages
+        run: |
+          sudo apt-get -y purge ruby ruby2.5
+          sudo apt-get -y autoremove
+
+      - name: Delete Ruby stuff, we will install our own Ruby with this role
+        run: sudo rm /usr/local/bin/update_rubygems
+
+      # -- Cleanup end --
+
+      - name: Checkout code from Github
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install latest Ansible through pip
+        run: pip install ansible
+
+      - name: Output python and ansible versions
+        run: |
+          python --version
+          ansible --version
+
+      - name: Create ansible.cfg with correct roles_path
+        run: printf '[defaults]\nroles_path=../' > ansible.cfg
+
+      - name: Basic Ansible role syntax check
+        run: ansible-playbook -i tests/inventory --syntax-check tests/test.yml
+
+      - name: Real Ansible run
+        run: ansible-playbook -i tests/inventory tests/test.yml
+
+      - name: Second run to check for indempotence (allow 2 changes for reading state)
+        run: "ansible-playbook -i tests/inventory tests/test.yml | grep -q 'changed=2.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)"
+
+      - name: Setup serverspec (install gem)
+        run: sudo gem install serverspec
+
+      - name: Run serverspec
+        run: sudo rake spec

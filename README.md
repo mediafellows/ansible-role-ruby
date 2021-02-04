@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/mediafellows/ansible-role-ruby.svg?branch=master)](https://travis-ci.com/mediafellows/ansible-role-ruby)
+[![Ansible-Test](https://github.com/mediafellows/ansible-role-ruby/workflows/Ansible-Test/badge.svg)](https://github.com/mediafellows/ansible-role-ruby/actions?query=workflow%3AAnsible-Test)
 
 # Ansible role ruby
 
