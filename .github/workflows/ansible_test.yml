@@ -10,18 +10,20 @@ jobs:
       ANSIBLE_FORCE_COLOR: true
     steps:
 
+      # -- CI runnner cleanup --
+
       - name: Remove uneeded apt repos (causing issues)
         run: sudo rm /etc/apt/sources.list.d/yarn*
 
-      - name: Remove ruby stuff
+      - name: Remove Ruby packages
         run: |
           sudo apt-get -y purge ruby ruby2.5
           sudo apt-get -y autoremove
 
-      - name: Output ruby stuff
-        run: |
-          ls /usr/bin/r*
-          ls /usr/local/bin/
+      - name: Delete Ruby stuff, we will install our own Ruby with this role
+        run: sudo rm /usr/bin/ruby /usr/bin/gem /usr/local/bin/update_rubygems
+
+      # -- Cleanup end --
 
       - name: Checkout code from Github
         uses: actions/checkout@v2
