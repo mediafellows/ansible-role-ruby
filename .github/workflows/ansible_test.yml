@@ -13,16 +13,8 @@ jobs:
       - name: Remove uneeded apt repos (causing issues)
         run: sudo rm /etc/apt/sources.list.d/yarn*
 
-      - name: Delete rubies and RVM, we will install our own Ruby with this role
-        run: |
-          sudo rm /usr/bin/ruby /usr/bin/gem
-          rvm implode --force
-          rm -rf /home/travis/.rvm/
-          rm ~/.rvmrc
-          unset MY_RUBY_HOME
-          unset GEM_HOME
-          unset GEM_PATH
-          env
+      - name: Delete Ruby stuff, we will install our own Ruby with this role
+        run: sudo rm /usr/bin/ruby /usr/bin/gem
 
       - name: Checkout code from Github
         uses: actions/checkout@v2
