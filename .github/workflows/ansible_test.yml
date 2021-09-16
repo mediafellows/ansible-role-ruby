@@ -13,6 +13,11 @@ jobs:
       - name: Check if ruby is pre-installed on CI runner
         run: ruby --version || echo 'No ruby found'
 
+      - name: Remove pre-installed Ruby
+        run: |
+          sudo apt-get -y purge ruby ruby2.7 || echo 'Not all packages found'
+          sudo apt-get -y autoremove
+
       - name: Checkout code from Github
         uses: actions/checkout@v2
 
