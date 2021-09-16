@@ -10,14 +10,8 @@ jobs:
       ANSIBLE_FORCE_COLOR: true
     steps:
 
-      # -- CI runnner cleanup --
-
-      - name: Remove Ruby packages
-        run: |
-          sudo apt-get -y purge ruby ruby2.5
-          sudo apt-get -y autoremove
-
-      # -- Cleanup end --
+      - name: Check if ruby is pre-installed on CI runner
+        run: ruby --version || echo 'No ruby found'
 
       - name: Checkout code from Github
         uses: actions/checkout@v2
