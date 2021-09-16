@@ -4,7 +4,7 @@
 # See https://github.com/postmodern/ruby-install for more details
 
 - name: Download ruby-install
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/postmodern/ruby-install/archive/v{{ ruby_install_version }}.tar.gz
     dest: "{{ ansible_env.HOME }}/ruby-install-{{ ruby_install_version }}.tar.gz"
   when:
@@ -14,7 +14,7 @@
   register: ruby_install_downloaded
 
 - name: Extract ruby-install
-  unarchive:
+  ansible.builtin.unarchive:
     copy: no
     src: "{{ ansible_env.HOME }}/ruby-install-{{ ruby_install_version }}.tar.gz"
     dest: "{{ ansible_env.HOME }}"
@@ -22,32 +22,34 @@
 
 - name: Install ruby-install
   become: true
-  shell:
-    chdir={{ ansible_env.HOME }}/ruby-install-{{ ruby_install_version }}
-    make install
+  ansible.builtin.shell:
+    cmd: make install
+    chdir: "{{ ansible_env.HOME }}/ruby-install-{{ ruby_install_version }}"
   when: ruby_install_downloaded is changed
   register: ruby_install_installed
 
 - name: Clean up ruby-install sources
-  shell: rm -rf {{ ansible_env.HOME }}/ruby-install-*
+  ansible.builtin.shell:
+    cmd: rm -rf {{ ansible_env.HOME }}/ruby-install-*
   when: ruby_install_downloaded is changed
 
 # Setup ruby-install facts.d
 
 - name: Capture installed ruby-install version
-  shell: ruby-install --version | awk '{ print $2 }'
+  ansible.builtin.shell:
+    cmd: ruby-install --version | awk '{ print $2 }'
   ignore_errors: yes
   register: installed_ruby_install_version
 
 - name: Create ansible facts directory
   become: true
-  file:
+  ansible.builtin.file:
     state: directory
     recurse: yes
     path: /etc/ansible/facts.d
 
 - name: Set ruby-install facts
   become: true
-  template:
+  ansible.builtin.template:
     src: ruby_install.fact
     dest: /etc/ansible/facts.d/ruby_install.fact

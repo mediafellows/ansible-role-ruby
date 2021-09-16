@@ -12,26 +12,15 @@ jobs:
 
       # -- CI runnner cleanup --
 
-      - name: Remove uneeded apt repos (causing issues)
-        run: sudo rm /etc/apt/sources.list.d/yarn*
-
-      - name: Remove Ruby packages
+     - name: Remove Ruby packages
         run: |
           sudo apt-get -y purge ruby ruby2.5
           sudo apt-get -y autoremove
-
-      - name: Delete Ruby stuff, we will install our own Ruby with this role
-        run: sudo rm /usr/local/bin/update_rubygems
 
       # -- Cleanup end --
 
       - name: Checkout code from Github
         uses: actions/checkout@v2
-
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
 
       - name: Install latest Ansible through pip
         run: pip install ansible

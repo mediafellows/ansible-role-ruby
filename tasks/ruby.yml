@@ -4,16 +4,16 @@
 # Additional this play also installs bundler and does the symlinking.
 
 - name: Output ruby edition and version to be installed
-  debug:
+  ansible.builtin.debug:
     msg: "{{ ruby_edition }} - {{ ruby_version }}"
 
 - name: Add apt repositories for ruby dependencies
-  apt_repository: repo={{ item }} state=present update_cache=yes
+  ansible.builtin.apt_repository: repo={{ item }} state=present update_cache=yes
   with_items: "{{ ruby_deps_apt_repos }}"
 
 - name: Ensure all dependencies are met to run the ruby-install tool without problems
   become: true
-  apt:
+  ansible.builtin.apt:
     name:
       - wget
       - bzip2
@@ -24,7 +24,8 @@
     state: present
 
 - name: Install given ruby version from source using ruby-install
-  command: ruby-install {{ ruby_edition }} {{ ruby_version }} --install-dir {{ ruby_location }} --cleanup --no-reinstall
+  ansible.builtin.command:
+    cmd: ruby-install {{ ruby_edition }} {{ ruby_version }} --install-dir {{ ruby_location }} --cleanup --no-reinstall
   args:
     creates: "{{ ruby_executable }}"
   when: ruby_edition != 'jruby'
@@ -32,7 +33,8 @@
 # --- Jruby special treament ---
 # Accept Java license in case Oracle Java is being used
 - name: Accept Oracle license prior JDK installation
-  shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections; echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections creates=/usr/lib/jvm/java-8-oracle
+  ansible.builtin.shell:
+    cmd: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections; echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections creates=/usr/lib/jvm/java-8-oracle
   when: ruby_edition == 'jruby' and jruby_jre_package is match('oracle')
 
 # ruby-install is installing full java (not just headless-jre).
@@ -42,16 +44,21 @@
 # java edition (such as oracle java)
 
 - name: Install Jruby dependencies (Java) manually as the ruby-install would do too much
-  apt: name={{ jruby_jre_package }} state=present
+  ansible.builtin.apt:
+    name: '{{ jruby_jre_package }}'
+    state: present
   when: ruby_edition == 'jruby'
 
 # Workaround for https://github.com/jruby/jruby/issues/3285 for jruby versions > 1.7.21
 - name: Install Jruby dependency (libc6-dev) to fix a problem with libcrypt which is otherwise not found by jrubies gem command
-  apt: name=libc6-dev state=present
+  ansible.builtin.apt:
+    name: libc6-dev
+    state: present
   when: ruby_edition == 'jruby'
 
 - name: Install given jruby version from source using ruby-install (for jruby we need to disable dependency install to not create a mess)
-  command: ruby-install {{ ruby_edition }} {{ ruby_version }} --install-dir {{ rubies_dir }} --cleanup --no-install-deps --no-reinstall
+  ansible.builtin.command:
+    cmd: ruby-install {{ ruby_edition }} {{ ruby_version }} --install-dir {{ rubies_dir }} --cleanup --no-install-deps --no-reinstall
   args:
     creates: "{{ ruby_executable }}"
   when: ruby_edition == 'jruby'
@@ -63,17 +70,18 @@
 # * 'gem install bundler' needs the '--force' option as it otherwise won't work after a 'gem update --system', see issue https://github.com/rubygems/rubygems/issues/2058
 # * The '-N' option is used to not generate documentation (shorthand for --no-document)
 - name: Install Bundler (after making sure latest RubyGems is installed)
-  shell: "{{ gem_executable }} update -N --system && {{ gem_executable }} install -N --force bundler {{ ruby_bundler_flags }}"
-  args:
+  ansible.builtin.shell:
+    cmd: "{{ gem_executable }} update -N --system && {{ gem_executable }} install -N --force bundler {{ ruby_bundler_flags }}"
     creates: "{{ ruby_location }}/bin/bundle"
   when: ruby_bundler_installing|bool
 
 - name: Install other system gems
-  shell: "{{ gem_executable }} install {{ item }}"
+  ansible.builtin.shell:
+    cmd: "{{ gem_executable }} install {{ item }}"
   with_items: "{{ ruby_system_gems }}"
 
 - name: Get all files in ruby bin directory
-  find:
+  ansible.builtin.find:
     paths: "{{ ruby_location }}/bin/"
     patterns: '*'
     file_type: file
@@ -81,7 +89,7 @@
 
 - name: Symlink all Ruby bins from /usr/local/bin
   become: true
-  file:
+  ansible.builtin.file:
     path: "/usr/local/bin/{{ item.path.split('/')|last }}"
     src: "{{ item.path }}"
     state: link
@@ -89,9 +97,10 @@
   when: ruby_bin_symlinking|bool
 
 - name: Collect Ruby infos
-  shell: "whoami && ruby -v && gem -v && bundle -v"
+  ansible.builtin.shell:
+    cmd: "whoami && ruby -v && gem -v && bundle -v"
   register: ruby_infos
 
 - name: Output Ruby infos
-  debug:
+  ansible.builtin.debug:
     var: ruby_infos.stdout_lines

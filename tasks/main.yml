@@ -3,13 +3,13 @@
 
 - name: Ensure make is installed (needed to install ruby_install)
   become: true
-  apt:
+  ansible.builtin.apt:
     name: make
     state: present
     update_cache: yes
 
 # Installs the ruby-install tool:
-- import_tasks: ruby_install.yml
+- ansible.builtin.import_tasks: ruby_install.yml
 
 # Installs ruby itself (from source):
-- import_tasks: ruby.yml
+- ansible.builtin.import_tasks: ruby.yml
