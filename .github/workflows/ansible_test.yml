@@ -12,7 +12,7 @@ jobs:
 
       # -- CI runnner cleanup --
 
-     - name: Remove Ruby packages
+      - name: Remove Ruby packages
         run: |
           sudo apt-get -y purge ruby ruby2.5
           sudo apt-get -y autoremove
