@@ -64,6 +64,10 @@
   when: ruby_edition == 'jruby'
 # --- end of Jruby special treatment ---
 
+- name: Output executable paths (as they are calculated)
+  ansible.builtin.debug:
+    msg: "Ruby executable: {{ ruby_executable }} | Gem executable: {{ gem_executable }}"
+
 # See docs for gem install/update at https://guides.rubygems.org/command-reference/
 # Some notes on workarrounds added here:
 # * 'gem update --system' is necessary to always ensure RubyGems is up to date enough for gem install bundler to work / for detecting recent bundlers
@@ -74,6 +78,13 @@
     cmd: "{{ gem_executable }} update -N --system && {{ gem_executable }} install -N --force bundler {{ ruby_bundler_flags }}"
     creates: "{{ ruby_location }}/bin/bundle"
   when: ruby_bundler_installing|bool
+
+- name: Install latest bundler (also updates if bin/bundle already exists)
+  ansible.builtin.shell:
+    cmd: "{{ gem_executable }} install bundler {{ ruby_bundler_flags }}"
+  when:
+    - ruby_bundler_installing|bool
+    - ruby_bundler_update|bool
 
 - name: Install other system gems
   ansible.builtin.shell:

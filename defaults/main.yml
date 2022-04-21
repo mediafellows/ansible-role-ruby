@@ -22,6 +22,7 @@ jruby_jre_package: openjdk-7-jre-headless # oracle-java8-installer
 # on newer ruby version bundler is distributed with ruby already, so it might be ok
 # to change this for false.
 ruby_bundler_installing: true
+ruby_bundler_update: true
 ruby_bundler_flags: ""
 
 # Define additional gems to be installed and linked
