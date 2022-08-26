@@ -75,16 +75,23 @@
 # * The '-N' option is used to not generate documentation (shorthand for --no-document)
 - name: Install Bundler (after making sure latest RubyGems is installed)
   ansible.builtin.shell:
-    cmd: "{{ gem_executable }} update -N --system && {{ gem_executable }} install -N --force bundler {{ ruby_bundler_flags }}"
+    cmd: "{{ gem_executable }} update -N --system && {{ gem_executable }} install -N --force bundler"
     creates: "{{ ruby_location }}/bin/bundle"
   when: ruby_bundler_installing|bool
 
 - name: Install latest bundler (also updates if bin/bundle already exists)
   ansible.builtin.shell:
-    cmd: "{{ gem_executable }} install bundler {{ ruby_bundler_flags }}"
+    cmd: "{{ gem_executable }} install -N bundler"
   when:
     - ruby_bundler_installing|bool
     - ruby_bundler_update|bool
+
+- name: Install specific bundler version (also updates if bin/bundle already exists)
+  ansible.builtin.shell:
+    cmd: "{{ gem_executable }} install -N -v {{ ruby_bundler_version }} bundler"
+  when:
+    - ruby_bundler_installing|bool
+    - ruby_bundler_version is defined
 
 - name: Install other system gems
   ansible.builtin.shell:
