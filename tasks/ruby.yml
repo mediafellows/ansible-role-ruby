@@ -112,7 +112,9 @@
     src: "{{ item.path }}"
     state: link
   with_items: "{{ ruby_bin_files.files }}"
-  when: ruby_bin_symlinking|bool
+  when:
+    - ruby_bin_symlinking|bool
+    - not "/usr/local/bin/{{ item.path.split('/')|last }}" is exists
 
 - name: Collect Ruby infos
   ansible.builtin.shell:
