@@ -1,12 +1,12 @@
 # mediafellows.ruby role defaults
 
-ruby_version_string: 2.4.4 # can also contain the ruby edition separated with a dash such as jruby-1.7, wihout it it defaults to mri
+ruby_version_string: 2.7.2 # can also contain the ruby edition separated with a dash such as jruby-1.7, wihout it it defaults to mri
 
 contains_edition: '{{ ruby_version_string is match(".*-.+") }}'
 ruby_version: "{% if contains_edition|bool %}{{ ruby_version_string.split('-')[1] }}{% else %}{{ruby_version_string}}{% endif %}"
 ruby_edition: "{% if contains_edition|bool %}{{ ruby_version_string.split('-')[0] }}{% else %}ruby{% endif %}"
 
-ruby_install_version: '0.8.2'
+ruby_install_version: '0.9.3'
 rubies_dir: /opt/rubies
 ruby_location: "{{rubies_dir}}/{{ruby_edition}}-{{ruby_version}}"
 
@@ -16,7 +16,7 @@ ruby_bin_symlinking: true
 ruby_deps_apt_repos: []
   #  - 'ppa:webupd8team/java'
 
-jruby_jre_package: openjdk-7-jre-headless # oracle-java8-installer
+jruby_jre_package: openjdk-8-jre-headless # oracle-java8-installer
 
 # Install bundler settings:
 # on newer ruby version bundler is distributed with ruby already, so it might be ok
