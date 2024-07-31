@@ -107,14 +107,11 @@
 
 - name: Symlink all Ruby bins from /usr/local/bin
   become: true
-  ansible.builtin.file:
-    path: "/usr/local/bin/{{ item.path.split('/')|last }}"
-    src: "{{ item.path }}"
-    state: link
+  ansible.builtin.command:
+    cmd: ln -s {{ item.path }} /usr/local/bin/{{ item.path.split('/')|last }}
+    creates: /usr/local/bin/{{ item.path.split('/')|last }}
   with_items: "{{ ruby_bin_files.files }}"
-  when:
-    - ruby_bin_symlinking|bool
-    - not "/usr/local/bin/{{ item.path.split('/')|last }}" is exists
+  when: ruby_bin_symlinking|bool
 
 - name: Collect Ruby infos
   ansible.builtin.shell:
